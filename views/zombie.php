@@ -10,6 +10,6 @@ class Zombie_View extends View {
     $data['page_title'] = 'The Zombist';
     $data['id'] = $this->zombie->get_id();
     $data['name'] = $this->zombie->get_name();
-    $this->use_template('one_zombie', $data);
+    $this->output_template('one_zombie', $data);
   }
 }
