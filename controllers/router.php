@@ -19,10 +19,14 @@ fetch.php, in the controllers directory.
 
 This router will call the method main of the controller, and pass it 
 parameters from the URL.
+ 
+If no parameters are supplied (e.g., http://xxx.com), a controller called
+default will run.
 
 There are some sample files showing usage:
 
 controllers/show.php - show some data.
+controllers/default.php - a default controller.
 models/zombie.php - model for zombies.
 views/zombie.php - view for showing zombie data.
 views/templates/one_zombie.php - template views/zombie.php uses to show data.
@@ -38,18 +42,24 @@ spl_autoload_register('load_class');
 
 //Fetch the request, from the URL.
 $request = $_SERVER['QUERY_STRING'];
-//Parse the page request and other variables
-$parsed = explode('&' , $request);
-//The controller name is the first element.
-$controller_name = filter_var(urldecode(array_shift($parsed)), FILTER_SANITIZE_STRING);
-//The rest of the array are get statements, parse them out.
-$parameters = array();
-foreach ($parsed as $argument) {
-  //split GET vars along '=' symbol to separate variable, values
-  list($variable , $value) = explode('=' , $argument);
-  $parameters[$variable] = filter_var(urldecode($value), FILTER_SANITIZE_STRING);
+if ( $request == '' ) {
+  //No parameters. Use the default controller.
+  $controller_name = 'default';
+  $parameters = array();
 }
-
+else {
+  //Parse the page request and other variables
+  $parsed = explode('&' , $request);
+  //The controller name is the first element.
+  $controller_name = filter_var(urldecode(array_shift($parsed)), FILTER_SANITIZE_STRING);
+  //The rest of the array are get statements, parse them out.
+  $parameters = array();
+  foreach ($parsed as $argument) {
+    //split GET vars along '=' symbol to separate variable, values
+    list($variable , $value) = explode('=' , $argument);
+    $parameters[$variable] = filter_var(urldecode($value), FILTER_SANITIZE_STRING);
+  }
+} //End parameters in URL.
 //Compute the path to the controller file
 $target = $app_file_root . '/controllers/' . $controller_name . '.php';
 if (file_exists($target)) {
